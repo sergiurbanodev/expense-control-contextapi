@@ -11,11 +11,14 @@ import { formatDate } from "../helpers";
 import { Expense } from "../types";
 import AmountDisplay from "./AmountDisplay";
 import "react-swipeable-list/dist/styles.css";
+import { useBudget } from "../hooks/useBudget";
 
 type ExpenseDetailProps = {
   expense: Expense;
 };
 export default function ExpenseDetail({ expense }: ExpenseDetailProps) {
+  const { dispatch } = useBudget();
+
   const categoryInfo = useMemo(
     () => categories.filter((cat) => cat.id === expense.category)[0],
     [expense]
@@ -23,13 +26,24 @@ export default function ExpenseDetail({ expense }: ExpenseDetailProps) {
 
   const leadingActions = () => (
     <LeadingActions>
-      <SwipeAction onClick={() => {}}>Update</SwipeAction>
+      <SwipeAction
+        onClick={() =>
+          dispatch({ type: "get-expense-by-id", payload: { id: expense.id } })
+        }
+      >
+        Update
+      </SwipeAction>
     </LeadingActions>
   );
 
   const trailingActions = () => (
     <TrailingActions>
-      <SwipeAction onClick={() => {}} destructive={true}>
+      <SwipeAction
+        onClick={() =>
+          dispatch({ type: "remove-expense", payload: { id: expense.id } })
+        }
+        destructive={true}
+      >
         Delete
       </SwipeAction>
     </TrailingActions>
@@ -38,11 +52,10 @@ export default function ExpenseDetail({ expense }: ExpenseDetailProps) {
   return (
     <SwipeableList>
       <SwipeableListItem
-        maxSwipe={30}
         leadingActions={leadingActions()}
         trailingActions={trailingActions()}
       >
-        <div className="bg-white shadow-lg p-10 w-full flex gap-5 border-b border-gray-200 items-center">
+        <div className="bg-white shadow-lg p-5 w-full flex gap-5 border-b border-gray-200 items-center">
           <div>
             <img
               src={`/icono_${categoryInfo.icon}.svg`}
